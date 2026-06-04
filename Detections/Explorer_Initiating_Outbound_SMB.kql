@@ -1,0 +1,17 @@
+// Description: Detects SMB (TCP 445/139) network connections initiated by Windows Explorer (explorer.exe) to external public IP addresses, which may indicate malicious UNC path execution, phishing-driven file access, or attempted communication with adversary-controlled SMB infrastructure outside the internal network.
+// MITRE ATT&CK: T1021.002, T1105, T1204
+// Data Sources: DeviceNetworkEvents
+// Threat Actor: Commonly associated with phishing campaigns, malware delivery chains, and adversary lateral movement or staging over SMB; not attributed to a single actor.
+// Severity: High
+// False Positives: Rare legitimate use cases such as sanctioned external SMB services, misconfigured network routing, VPN edge cases, or security testing environments.
+
+DeviceNetworkEvents
+| where InitiatingProcessFileName =~ "explorer.exe"
+| where RemotePort in (445,139)
+| where not(ipv4_is_private(RemoteIP))
+| project
+    Timestamp,
+    DeviceName,
+    RemoteIP,
+    RemotePort,
+    InitiatingProcessFileName
