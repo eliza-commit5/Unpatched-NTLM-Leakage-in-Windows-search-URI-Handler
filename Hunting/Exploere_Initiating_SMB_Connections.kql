@@ -1,0 +1,20 @@
+// Description: Detects SMB network connections initiated by Windows Explorer (explorer.exe) to remote hosts over ports 445 and 139, which may indicate user interaction with remote file shares, phishing-delivered UNC paths, or adversary-controlled SMB infrastructure.
+// MITRE ATT&CK: T1021.002, T1105, T1204
+// Data Sources: DeviceNetworkEvents
+// Threat Actor: Commonly observed across phishing campaigns, malware delivery operations, and post-compromise activity involving SMB shares; not attributed to a specific threat actor.
+// Severity: Medium
+// False Positives: Legitimate access to corporate file servers, mapped network drives, shared folders, print servers, document repositories, and standard Windows file browsing activity.
+
+DeviceNetworkEvents
+| where Timestamp > ago(30d)
+| where InitiatingProcessFileName =~ "explorer.exe"
+| where RemotePort in (445, 139)
+| project
+    Timestamp,
+    DeviceName,
+    InitiatingProcessFileName,
+    RemoteIP,
+    RemotePort,
+    RemoteUrl,
+    InitiatingProcessCommandLine
+| order by Timestamp desc
