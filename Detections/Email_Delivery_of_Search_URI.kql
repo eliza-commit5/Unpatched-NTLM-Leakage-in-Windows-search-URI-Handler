@@ -1,0 +1,27 @@
+// Description: Detects email-delivered Windows Search URIs ("search:" / "search-ms:") embedded in messages, which may indicate phishing attempts leveraging Windows Search protocol handlers to redirect users to remote file shares, malicious shortcuts, or attacker-controlled content.
+// MITRE ATT&CK: T1204.001, T1204.002, T1566.001
+// Data Sources: EmailUrlInfo, EmailEvents
+// Threat Actor: Common in phishing campaigns and social engineering attacks abusing Windows Search URI handlers for payload delivery or redirection; not attributed to a single actor.
+// Severity: High
+// False Positives: Legitimate enterprise emails containing documentation links, internal search links, or productivity tool integrations that intentionally use search URIs.
+
+EmailUrlInfo
+| where Url startswith "search:"
+    or Url startswith "search-ms:"
+| project
+    Timestamp,
+    NetworkMessageId,
+    Url
+| join kind=leftouter (
+    EmailEvents
+    | project
+        NetworkMessageId,
+        RecipientEmailAddress,
+        SenderFromAddress
+) on NetworkMessageId
+| project
+    Timestamp,
+    Url,
+    RecipientEmailAddress,
+    SenderFromAddress,
+    NetworkMessageId
