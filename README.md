@@ -27,21 +27,7 @@ T1557	Adversary-in-the-Middle
 T1110.002	Password Cracking
 T1021.002	SMB/Windows Admin Shares
 
-Repository Contents
-.
-├── Hunting
-│   ├── *********.kql
-│   ├── ********.kql
-│   ├── ******.kql
-│   └── *******.kql
-│
-├── Detections
-│   ├── *********.kql
-│   ├── ********.kql
-│   ├── *************.kql
-│   └── **********.kql
-│
-└── README.md
+
 
 Recommended Defender Configuration
 Custom Detection Settings
