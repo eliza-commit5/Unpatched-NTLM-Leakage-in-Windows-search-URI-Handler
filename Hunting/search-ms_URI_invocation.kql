@@ -1,0 +1,25 @@
+// Description: Detects execution of Windows Search protocol handlers (search: and search-ms:) in process command lines, which may indicate phishing-based initial access, malicious shortcut execution, or abuse of Windows Explorer search functionality to deliver payloads.
+// MITRE ATT&CK: T1204, T1204.002, T1059
+// Data Sources: DeviceProcessEvents
+// Threat Actor: Commonly observed across multiple threat groups and commodity malware campaigns; not attributed to a specific actor.
+// Severity: Medium
+// False Positives: Legitimate Windows Search usage, user-initiated file searches, enterprise search integrations, helpdesk troubleshooting activities, and benign application interactions with Windows Search.
+
+
+
+
+
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where ProcessCommandLine has_any ("search:", "search-ms:")
+    or InitiatingProcessCommandLine has_any ("search:", "search-ms:")
+| project
+    Timestamp,
+    DeviceName,
+    AccountName,
+    FileName,
+    ProcessCommandLine,
+    InitiatingProcessFileName,
+    InitiatingProcessCommandLine,
+    ReportId
+| order by Timestamp desc
