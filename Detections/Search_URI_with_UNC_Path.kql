@@ -1,0 +1,20 @@
+// Description: Detects execution of Windows Search URIs ("search:" / "search-ms:") combined with breadcrumb-based location manipulation ("crumb=location:") and UNC path redirection, which may indicate phishing-based search abuse, malicious shortcut execution, or attempts to redirect users to remote file shares for payload delivery.
+// MITRE ATT&CK: T1204.002, T1021.002, T1105
+// Data Sources: DeviceProcessEvents
+// Threat Actor: Commonly observed in phishing campaigns, malware delivery chains, and adversary tradecraft abusing Windows Search and UNC navigation; not attributed to a single actor.
+// Severity: High
+// False Positives: Legitimate enterprise use of Windows Search to access internal file shares, mapped drives, software distribution shares, and IT-driven remote resource navigation.
+
+
+DeviceProcessEvents
+| where ProcessCommandLine has "search:"
+    or ProcessCommandLine has "search-ms:"
+| where ProcessCommandLine has "crumb=location:"
+| where ProcessCommandLine matches regex @"\\\\[^\\]+\\"
+| project
+    Timestamp,
+    DeviceId,
+    DeviceName,
+    AccountName,
+    ProcessCommandLine,
+    InitiatingProcessFileName
