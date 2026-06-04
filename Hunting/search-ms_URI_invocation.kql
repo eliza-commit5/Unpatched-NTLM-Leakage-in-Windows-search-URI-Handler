@@ -7,7 +7,6 @@
 
 
 
-
 DeviceProcessEvents
 | where Timestamp > ago(30d)
 | where ProcessCommandLine has_any ("search:", "search-ms:")
