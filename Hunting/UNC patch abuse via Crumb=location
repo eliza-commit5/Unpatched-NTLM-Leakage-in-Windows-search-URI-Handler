@@ -1,0 +1,20 @@
+// Description: Detects process executions containing the Windows Search "crumb=location:" parameter that references a UNC network path, which may indicate abuse of Windows Explorer search functionality to access remote shares, deliver malicious content, or facilitate phishing and initial access techniques.
+// MITRE ATT&CK: T1204, T1204.002, T1021.002
+// Data Sources: DeviceProcessEvents
+// Threat Actor: Commonly observed in phishing campaigns, malware delivery operations, and adversary tradecraft leveraging Windows Search and remote network shares; not attributed to a specific actor.
+// Severity: Medium
+// False Positives: Legitimate searches of corporate file shares, administrative access to network resources, document management systems, file discovery activities, and normal user interactions with Windows Explorer search features.
+
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where ProcessCommandLine contains "crumb=location:"
+| where ProcessCommandLine matches regex @"\\\\[^\\]+\\"
+| project
+    Timestamp,
+    DeviceName,
+    AccountName,
+    FileName,
+    ProcessCommandLine,
+    InitiatingProcessFileName,
+    InitiatingProcessCommandLine
+| order by Timestamp desc
