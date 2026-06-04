@@ -1,0 +1,36 @@
+// Description: Detects Windows Search URI abuse ("search:" / "search-ms:") combined with breadcrumb-based location manipulation ("crumb=location:") and UNC path redirection, followed by SMB (TCP 445/139) network activity within a short time window, and aggregates results per device, account, and remote IP to highlight repeated or sustained suspicious execution chains.
+// MITRE ATT&CK: T1204.002, T1021.002, T1105
+// Data Sources: DeviceProcessEvents, DeviceNetworkEvents
+// Threat Actor: Common in phishing campaigns, malware delivery chains, and adversary tradecraft abusing Windows Search and SMB-based file delivery mechanisms; not attributed to a single actor.
+// Severity: High
+// False Positives: Legitimate enterprise use of Windows Search to access internal file shares, mapped drives, software distribution repositories, and repetitive user-initiated browsing of network resources.
+
+DeviceProcessEvents
+| where Timestamp > ago(7d)
+| where ProcessCommandLine has_any ("search:", "search-ms:")
+| where ProcessCommandLine has "crumb=location:"
+| where ProcessCommandLine matches regex @"\\\\[^\\]+\\"
+| project
+    DeviceId,
+    DeviceName,
+    AccountName = InitiatingProcessAccountName,
+    UriTime = Timestamp,
+    ProcessCommandLine
+| join kind=inner (
+    DeviceNetworkEvents
+    | where Timestamp > ago(7d)
+    | where RemotePort in (445, 139)
+    | project
+        DeviceId,
+        SMBTime = Timestamp,
+        RemoteIP,
+        RemotePort
+) on DeviceId
+| where SMBTime between (UriTime .. UriTime + 5m)
+| summarize
+    FirstSeen = min(UriTime),
+    LastSeen = max(SMBTime)
+    by DeviceName,
+       AccountName,
+       RemoteIP,
+       ProcessCommandLine
