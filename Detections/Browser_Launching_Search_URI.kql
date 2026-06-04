@@ -1,0 +1,22 @@
+// Description: Detects execution of Windows Search URIs ("search:" / "search-ms:") spawned from common user-facing applications such as web browsers (Edge, Chrome, Firefox) or Microsoft Outlook, which may indicate phishing-driven execution, malicious shortcut activation, or abuse of Windows Search protocol handlers for remote resource redirection.
+// MITRE ATT&CK: T1204.001, T1204.002, T1059
+// Data Sources: DeviceProcessEvents
+// Threat Actor: Common in phishing campaigns and social engineering attacks leveraging Windows Search URIs delivered via email or browser content; not attributed to a single actor.
+// Severity: High
+// False Positives: Legitimate enterprise use of search URIs in internal documentation portals, productivity tools, or helpdesk workflows involving Windows Search integration.
+
+DeviceProcessEvents
+| where InitiatingProcessFileName in~
+(
+    "msedge.exe",
+    "chrome.exe",
+    "firefox.exe",
+    "outlook.exe"
+)
+| where ProcessCommandLine has_any ("search:", "search-ms:")
+| project
+    Timestamp,
+    DeviceName,
+    AccountName,
+    InitiatingProcessFileName,
+    ProcessCommandLine
